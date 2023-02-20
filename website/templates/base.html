@@ -1,0 +1,844 @@
+{% load cms_tags menu_tags sekizai_tags parler_tags i18n staticfiles compress mptt_tags widget_tweaks robots_index %}
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html lang="en" prefix="og: http://ogp.me/ns#" class="lt-ie10 lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" prefix="og: http://ogp.me/ns#" class="lt-ie10 lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" prefix="og: http://ogp.me/ns#" class="lt-ie10 lt-ie9"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" prefix="og: http://ogp.me/ns#" class="lt-ie10"> <![endif]-->
+<!--[if (gte IE 10)|!(IE)]><!--><html lang="en" prefix="og: http://ogp.me/ns#"><!--<![endif]-->
+    {% load pwa %}
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!-- Facebook Meta -->
+        <meta name="facebook-domain-verification" content="satnzitbxmzrtyr1kbt2m62ahwdq2u" />
+        <title>{% block title %}{% page_attribute page_title %}{% endblock %}</title>
+        {% if branch and branch.meta_description%}
+        <meta name="description" content="{{ branch.meta_description }}">
+        {% else %}
+        <meta name="description" content="{% block meta_description %}{% page_attribute 'meta_description' %}{% endblock %}">
+        {% endif %}
+
+        <!-- Favicon -->
+        <link rel="apple-touch-icon" sizes="57x57" href="{{ MEDIA_URL }}favicon/apple-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="{{ MEDIA_URL }}favicon/apple-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="{{ MEDIA_URL }}favicon/apple-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="{{ MEDIA_URL }}favicon/apple-icon-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="{{ MEDIA_URL }}favicon/apple-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="{{ MEDIA_URL }}favicon/apple-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="{{ MEDIA_URL }}favicon/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="{{ MEDIA_URL }}favicon/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ MEDIA_URL }}favicon/apple-icon-180x180.png">
+        <link rel="icon" type="image/png" sizes="192x192"  href="{{ MEDIA_URL }}favicon/android-icon-192x192.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ MEDIA_URL }}favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="{{ MEDIA_URL }}favicon/favicon-96x96.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ MEDIA_URL }}favicon/favicon-16x16.png">
+        <meta name="msapplication-TileColor" content="#545759">
+        <meta name="msapplication-TileImage" content="{{ MEDIA_URL }}favicon/ms-icon-144x144.png">
+        <meta name="theme-color" content="#545759">
+
+<!--        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery.ui.base.min.css">-->
+        {% compress css %}
+            <!-- Framework -->
+            <link href="{% static 'life/css/lib/jquery.ui.css' %}" rel="stylesheet">
+            <link href="{% static 'life/css/bootstrap.min.css' %}" rel="stylesheet">
+            <!-- Custom styles -->
+            <link href="{% static 'life/css/styles.css' %}" rel="stylesheet">
+            <link href="{% static 'life/css/overlay.css' %}" rel="stylesheet">
+            <link href="{% static 'life/css/report.css' %}" rel="stylesheet">
+            <!-- Helpers -->
+            <link href="{% static 'life/css/flexslider.css' %}" rel="stylesheet">
+            <link href="{% static 'life/css/selectric.css' %}" rel="stylesheet">
+            <link href="{% static 'life/css/font-awesome.min.css' %}" rel="stylesheet">
+            <link href="{% static 'life/css/ie.css' %}" rel="stylesheet">
+        {% endcompress %}
+        {% progressive_web_app_meta %}
+    
+        <link href="https://fonts.googleapis.com/css?family=Oswald:300,400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Noto+Sans:400,400i,700,700i" rel="stylesheet">
+
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+            <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        {% render_block "css" postprocessor "compressor.contrib.sekizai.compress" %}
+
+        {% block meta %}
+            {% with request.current_page.get_title_obj.mytitleextension as page %}
+                {% if page.social_meta %}
+                    {% include 'socialmeta/socialmeta.html' %}
+                {% endif %}
+            {% endwith %}
+        {% endblock %}
+
+        <link rel="canonical" href="https://{{ site.domain }}{{ request.path }}">
+
+        <!-- Google Social Profile-->
+        <script type="application/ld+json">
+            { "@context" : "http://schema.org",
+                "@type" : "Organization",
+                "name" : "LiFE Residential",
+                "url" : "https://liferesidential.co.uk/",
+                "sameAs" : [ "https://www.facebook.com/LiFEResidential",
+                    "https://www.instagram.com/liferesidential",
+                    "https://www.linkedin.com/company/2268320"]
+            }
+        </script>
+
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-NM695ZS');</script>
+        <!-- End Google Tag Manager -->
+
+        <!-- Hotjar Tracking Code for http://liferesidential.co.uk/ -->
+        <script>(function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:197241,hjsv:5};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+        })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+        </script>
+
+        {% render_block "extrameta" %}
+
+        {% if request.path == '/'%}
+        {% addtoblock "extrameta" %}
+        <script type="application/ld+json">
+            {
+                "@context": "http://schema.org",
+                "@type": "Organization",
+                "name": "LiFE Residential",
+                "url": "https://liferesidential.co.uk/",
+                "image": "https://liferesidential-life-website.s3.eu-west-2.amazonaws.com/LifeLogo.png",
+                "logo": "https://liferesidential-life-website.s3.eu-west-2.amazonaws.com/LifeLogo.png",
+                "description": "LiFE Residential is one of the UK's leading real estate agencies. Our team of London-based estate and letting agents specialise in property management, renting, sales and investment.",
+                "areaServed": "London",
+                "sameAs": [
+                    "https://www.facebook.com/LiFEResidential",
+                    "https://www.instagram.com/liferesidential",
+                    "https://www.linkedin.com/company/2268320",
+                    "https://www.facebook.com/LiFEResidential/",
+                    "https://twitter.com/LiFEResProperty"
+                ]
+            }
+        </script>
+        <script type="application/ld+json">
+            {
+                "@context": "http://schema.org",
+                "@type": "ItemList",
+                "itemListElement": [
+                    {
+                        "@type": "SiteNavigationElement",
+                        "position": 1,
+                        "name": "Landlords",
+                        "description": "Expert lettings and property management for landlords",
+                        "url": "https://liferesidential.co.uk/landlords/"
+                    },
+                    {
+                        "@type": "SiteNavigationElement",
+                        "position": 2,
+                        "name": "Tenants",
+                        "description": "Professional property lettings for renters",
+                        "url": "https://liferesidential.co.uk/tenants/"
+                    },
+                    {
+                        "@type": "SiteNavigationElement",
+                        "position": 3,
+                        "name": "Buyers & Sellers",
+                        "description": "Buy or sell properties",
+                        "url": "https://liferesidential.co.uk/sales/"
+                    },
+                    {
+                        "@type": "SiteNavigationElement",
+                        "position": 4,
+                        "name": "Locations",
+                        "url": "https://liferesidential.co.uk/rent-or-buy/"
+                    },
+                    {
+                        "@type": "SiteNavigationElement",
+                        "position": 5,
+                        "name": "Locations",
+                        "description": "Find an office near you",
+                        "url": "https://liferesidential.co.uk/contact-us/"
+                    },
+                    {
+                        "@type": "SiteNavigationElement",
+                        "position": 6,
+                        "name": "Property Developments",
+                        "description": "Explore our popular property developments in London.",
+                        "url": "https://liferesidential.co.uk/development/"
+                    }
+                ]
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id" : "https://liferesidential.co.uk/contact-us/head-office/",
+            "name": " LiFE Residential Head Office"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Park Royal",
+            "addressRegion": "London",
+            "streetAddress": "2 Lakeside Drive",
+            "postalCode": "NW10 7FQ"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 18:30",
+            "Sa 10:00 - 16:00"
+            ],
+            "telephone": "+44 (0)20 8003 4605",
+            "email": "info@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.2",
+            "reviewCount": "263"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/canary-wharf/",
+            "name": " LiFE Residential Canary Wharf"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Isle of Dogs",
+            "addressRegion": "London",
+            "streetAddress": "36 Millharbour",
+            "postalCode": "E14 9JS"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 18:30",
+            "Sa 10:00 - 16:00"
+            ],
+            "telephone": "+44 (0)20 3797 3982",
+            "email": "canarywharf@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.4",
+            "reviewCount": "191"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/deptford/",
+            "name": " LiFE Residential Deptford"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Deptford",
+            "addressRegion": "London",
+            "streetAddress": "Block A Hudson Building",
+            "postalCode": "SE10 8EA"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 18:30",
+            "Sa 10:00 - 16:00"
+            ],
+            "telephone": "+44 (0)20 3553 8315",
+            "email": "deptford@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.2",
+            "reviewCount": "82"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/east-london/",
+            "name": " LiFE Residential East London"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "East London",
+            "addressRegion": "London",
+            "streetAddress": "Unit B, Westgate Apartments, 14 Western Gateway",
+            "postalCode": "E16 1FD"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 17:30"
+            ],
+            "telephone": "+44 (0)20 3944 0937",
+            "email": "eastlondon@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.6",
+            "reviewCount": "78"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/greenwich/",
+            "name": " LiFE Residential Greenwich"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Greenwich",
+            "addressRegion": "London",
+            "streetAddress": "6 Victoria Parade",
+            "postalCode": "SE10 9FR"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 18:30",
+            "Sa 10:00 - 16:00"
+            ],
+            "telephone": "+44 (0)20 3944 4328",
+            "email": "greenwich@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.6",
+            "reviewCount": "71"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/nine-elms-riverside/",
+            "name": " LiFE Residential Nine Elms Riverside"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Vauxhall",
+            "addressRegion": "London",
+            "streetAddress": "11 Flagstaff House, St George Wharf, Wandsworth Road",
+            "postalCode": "SW8 2LZ"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 18:30",
+            "Sa 10:00 - 16:00"
+            ],
+            "telephone": "+44 (0)20 3393 4833",
+            "email": "nineelms@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.5",
+            "reviewCount": "110"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/north-london/",
+            "name": " LiFE Residential North London"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Highbury",
+            "addressRegion": "London",
+            "streetAddress": "Unit 4, 71b Drayton Park",
+            "postalCode": "N5 1BF"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 18:30"
+            ],
+            "telephone": "+44 (0)20 3811 0705",
+            "email": "northlondon@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.4",
+            "reviewCount": "42"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/royal-wharf/",
+            "name": " LiFE Residential Royal Wharf"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Royal Wharf",
+            "addressRegion": "London",
+            "streetAddress": "16 Royal Crest Avenue",
+            "postalCode": "E16 2TQ"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 18:30",
+            "Sa 10:00 - 16:00"
+            ],
+            "telephone": "+44 (0)20 3504 5566",
+            "email": "royalwharf@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.7",
+            "reviewCount": "36"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/south-bank/",
+            "name": " LiFE Residential South Bank"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Waterloo",
+            "addressRegion": "London",
+            "streetAddress": "252 Westminster Bridge Road",
+            "postalCode": "SE1 7PD"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 18:30",
+            "Sa 10:00 - 16:00"
+            ],
+            "telephone": "+44 (0) 20 3883 4202",
+            "email": "southbank@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "69"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/tower-bridge-city/",
+            "name": " LiFE Residential Tower Bridge - City"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Tower Bridge",
+            "addressRegion": "London",
+            "streetAddress": "Spice Quay Heights, 34 Shad Thames",
+            "postalCode": "SE1 2YG"
+            },
+            "openingHours": [
+            "Mo-Fr 8:30 - 18:30",
+            "Sa 10:00 - 16:00"
+            ],
+            "telephone": "+44 (0)20 3733 1250",
+            "email": "towerbridge@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.5",
+            "reviewCount": "107"
+            }
+            },
+            {
+            "@context": "http://schema.org/",
+            "@type": "RealEstateAgent",
+            "@id": "https://liferesidential.co.uk/contact-us/west-london/",
+            "name": " LiFE Residential West London"
+            "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Park Royal",
+            "addressRegion": "London",
+            "streetAddress": "FC200 Building, 2 Lakeside Drive",
+            "postalCode": "NW10 7FQ"
+            },
+            "openingHours": [
+            "Mo-Fr 9:00 - 18:00",
+            "Sa 10:00 - 16:00"
+            ],
+            "telephone": "+44 (0)20 3504 6907",
+            "email": "westlondonoffice@liferesidential.co.uk",
+            "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.2",
+            "reviewCount": "263"
+            }
+            }
+        </script>
+        {% endaddtoblock %}
+        {% endif%}
+
+        {#  This is needed for all the /news/tag/something pages so that they won't be indexed  #}
+        {%if '/news/tag' in request.path %}
+            <meta name="robots" content="noindex">
+        {% endif %}
+        {% page_robots %}
+        <!-- giosg tag -->
+
+        <script>
+
+            (function (w, t, f) {
+
+                var s = 'script', o = '_giosg', h = 'https://service.giosg.com', e, n;
+                e = t.createElement(s);
+                e.async = 1;
+                e.src = h + '/live/';
+
+                w[o] = w[o] || function () {
+                    (w[o]._e = w[o]._e || []).push(arguments)
+                };
+                w[o]._c = f;
+                w[o]._h = h;
+                n = t.getElementsByTagName(s)[0];
+                n.parentNode.insertBefore(e, n);
+
+            })(window, document, 6302);
+
+        </script>
+
+        <!-- giosg tag -->
+    </head>
+    <body {% block body_class %}{% endblock %}>
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src=https://www.googletagmanager.com/ns.html?id=GTM-NM695ZS
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+
+        {% cms_toolbar %}
+
+        {% include 'cookiebar/_cookie_bar.html' %}
+        {% include 'navigation/_jumbo_nav.html' %}
+
+
+        <div class="content-wrapper">
+
+            {% block stickyheader %}{% endblock %}
+
+            <div class="top" {% block nav_extra_attributes %}{% endblock %}>
+                {% render_model_block navigation.collapsed %}
+                    <a class="brand" href="{{ navigation.collapsed.home_page.get_absolute_url }}" title="{{ company_vocab.company_name }}" {% block brand_extra_attributes %}{% endblock %}></a>
+
+                    <ul class="utilities">
+                        {% if 'vacancy' in request.path %}
+                            <li class="mobile-favourites">
+                            <a href="{% url 'company:vacancy_shortlist' %}" title="{{ navigation.collapsed.vacancies_shortlist_text}}">
+                                <i class="mobile-favorites-icon-active{% if request.session.shortlist|length == 0 %} hide {% endif %}"></i>
+                                <i class="mobile-favorites-icon{% if request.session.shortlist|length > 0 %} hide {% endif %}"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                                                    <li class="mobile-favourites">
+                            <a href="{% url 'property:shortlist' %}" title="{{ navigation.collapsed.favourites_title }}">
+                                <i class="mobile-favorites-icon-active{% if request.session.shortlist|length == 0 %} hide {% endif %}"></i>
+                                <i class="mobile-favorites-icon{% if request.session.shortlist|length > 0 %} hide {% endif %}"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        <li class="login">
+                            <a href="{{ navigation.collapsed.login_url }}" title="{{ navigation.collapsed.login_title }}" target="_blank"><i class="login"></i>{{ navigation.collapsed.login_text }}</a>
+                        </li>
+                                                {% if 'vacancy' in request.path %}
+                        <li class="favorites">
+                            <a href="{% url 'company:vacancy_shortlist' %}" title="{{ navigation.collapsed.vacancies_shortlist_text}}">
+                                <i class="show-favorites{% if request.session.shortlist|length > 0 %} hide{% endif %}"></i>
+                                <i class="show-favorites-active{% if request.session.shortlist|length == 0 %} hide{% endif %}"></i>
+                                {{ navigation.collapsed.vacancies_shortlist_text}}
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="favorites">
+                            <a href="{% url 'property:shortlist' %}" title="{{ navigation.collapsed.favourites_title }}">
+                                <i class="show-favorites{% if request.session.shortlist|length > 0 %} hide{% endif %}"></i>
+                                <i class="show-favorites-active{% if request.session.shortlist|length == 0 %} hide{% endif %}"></i>
+                                {{ navigation.collapsed.favourites_text }}
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        <li class="quick-toggle-switches">
+                            <a class="quick-toggle rent-toggle selected">{{ property_app.vocab.rent_text }}</a>
+                            <a class="quick-toggle buy-toggle">{{ property_app.vocab.buy_text }}</a>
+                        </li>
+                        <li class="search">
+                            <div class="quick-search-wrapper">
+                                <form class="quick-search quick-search-buy" action="{% url 'property:listing' 'buy' %}" method="get">
+                                    {{ property_app.search_form.address|add_class:'form-control area-auto-complete' }}
+                                    <input type="submit" value="search" />
+                                </form>
+                                <form class="quick-search quick-search-rent" action="{% url 'property:listing' 'rent' %}" method="get">
+
+                                    {{ property_app.search_form.address|add_class:'form-control area-auto-complete' }}
+                                    <input type="submit" value="search" />
+                                </form>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <span class="tel" {% block tel_extra_attributes %}{% endblock %}><a href="tel:{{ navigation.collapsed.phone_number }}">{{ navigation.collapsed.display_phone_number }}</a></span>
+                {% endrender_model_block %}
+                <a class="menu-toggle" {% block menu_extra_attributes %}{% endblock %}></a>
+            </div>
+
+            {% block content %}{% endblock content %}
+
+            {% render_model_block footer.footer %}
+                <footer role="footer">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="footer-content">
+                                    <a href="{{ footer.footer.logo_page_url.get_absolute_url }}" title="{{ company_vocab.company_name }}"><img src="{{ footer.footer.logo.url }}" class="logo" /></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+
+                <div class="signoff">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <ul class="share">
+                                    {% for social_media_icon in footer.social_media_icons %}
+                                        <li><a href="{{ social_media_icon.url }}" title="{{ social_media_icon.title }}"{% if social_media_icon.open_new_window %} target="_blank"{% endif %}><i class="{{ social_media_icon.css_class }}"></i></a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <ul class="accreditations">
+                                    {% for accreditation_icon in footer.accreditation_icons %}
+                                        <li><a href="{{ accreditation_icon.url }}" title="{{ accreditation_icon.title }}"{% if accreditation_icon.open_new_window %} target="_blank"{% endif %}>
+                                            <img src="{{ accreditation_icon.image.url }}">
+                                        </a></li>
+                                    {% endfor %}
+                                </ul>
+                                <p class="legal">{{ footer.footer.legal | safe }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endrender_model_block %}
+        </div>
+
+        <a href="javascript:" id="return-to-top" class="btn-return-to-top"><i class="fa fa-chevron-up"></i></a>
+        
+        {% render_block "modal" %}
+
+        {% include 'property/modals/_advanced_search.html' %}
+            
+        {# js files #}
+
+<!--        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
+        {% compress js %}
+        <script src="{% static 'life/js/lib/jquery.js' %}"></script>
+        <script src="{% static 'life/js/lib/jquery-migrate.js' %}"></script>
+        <script src="{% static 'life/js/lib/jquery-ui.js' %}"></script>
+        {% endcompress %}
+<!--        <script src="https://code.jquery.com/jquery-migrate-3.0.1.min.js"></script>-->
+<!--        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZ1Vkm-AW3le4zs4Wixvnz03t-8mFjg1I"></script>
+
+        {% compress js %}
+        <script type="text/javascript">
+                var supportsTouch = false;
+
+                if ('ontouchstart' in window) // iOS & android
+                    supportsTouch = true;
+                else if(window.navigator.msPointerEnabled) // Win8
+                    supportsTouch = true;
+                else if ('ontouchstart' in document.documentElement) // Controversal way to check touch support
+                    supportsTouch = true;
+
+                if (supportsTouch) // Can register touchstart event?
+                    this.addEventListener('touchstart', ontouchstart, false);
+            </script>
+
+
+            <script src="{% static 'life/js/bootstrap.min.js' %}"></script>
+            <script src="{% static 'life/js/lazysizes.min.js' %}"></script>
+            <script src="{% static 'life/js/scrollReveal.js' %}"></script>
+            <script src="{% static 'life/js/overlay.js' %}"></script>
+            <script src="{% static 'life/js/plugins.js' %}"></script>
+            <script src="{% static 'life/js/jquery.dotdotdot.min.js' %}"></script>
+            <script src="{% static 'life/js/markerclusterer.js' %}"></script>
+            <script src="{% static 'life/js/jquery.placeholder.min.js' %}"></script>
+            <script src="{% static 'life/js/jquery.matchHeight-min.js' %}"></script>
+            <script src="{% static 'life/js/modernizr.js' %}"></script>
+            <script type="text/javascript">
+                // set by Django to avoid hardcoding paths in 
+                // js files.
+                var STATIC_URL = '{{ STATIC_URL }}';
+                var MEDIA_URL = '{{ MEDIA_URL }}';
+
+                $(function(){
+                    $(".area-auto-complete, .adv-buy-area-auto-complete, .adv-rent-area-auto-complete").autocomplete({
+                        source: function(request, response) {
+                            $.ajax({
+                                url: '{% url "area:all_location_api_view" %}?term=' + request.term,
+                                success: function(data) {
+                                    var resp = $.map(data, function(item) {
+                                        return {
+                                            label: 'Area: ' + item.name,
+                                            value: 'Area: ' + item.name
+                                        }
+                                    });
+                                    resp.unshift({
+                                        label: 'Text search: ' + request.term,
+                                        value: request.term
+                                    })
+                                    response(resp);
+                                }
+                            });                            
+                        }
+                    })
+                })
+
+                // recaptcha onload callback, call relevant enquiry forms
+                // have to take this approach as sales page has two contact
+                // forms in different plugins
+                // TODO: Refactor this asap cuz it's stupid
+                var recaptchaOnloadCallback = function() {
+                    if (typeof valuationRecaptchaOnloadCallback == 'function') {
+                        valuationRecaptchaOnloadCallback();
+                    }
+                    if (typeof contactRecaptchaOnloadCallback == 'function') {
+                        contactRecaptchaOnloadCallback();
+                    }
+                    if(typeof lettingContactRecaptchaOnloadCallback == 'function'){
+                        lettingContactRecaptchaOnloadCallback();
+                    }
+                    if(typeof saleContactRecaptchaOnloadCallback == 'function'){
+                        saleContactRecaptchaOnloadCallback();
+                    }
+                    if(typeof tabbedSliderContactRecaptchaOnloadCallback == 'function'){
+                        tabbedSliderContactRecaptchaOnloadCallback();
+                    }
+                    if(typeof tabbedSliderContactSidebarRecaptchaOnloadCallback == 'function'){
+                        tabbedSliderContactSidebarRecaptchaOnloadCallback();
+                    }
+                    if(typeof CVContactRecaptchaOnloadCallback == 'function'){
+                        CVContactRecaptchaOnloadCallback();
+                    }
+                    if(typeof gradContactRecaptchaOnloadCallback == 'function'){
+                        gradContactRecaptchaOnloadCallback();
+                    }
+                }
+            </script>
+            <script src="{% static 'life/js/custom.js' %}"></script>
+        {% endcompress %}        
+
+        {% render_block "js" postprocessor "compressor.contrib.sekizai.compress" %}
+        <script src="https://www.google.com/recaptcha/api.js?onload=recaptchaOnloadCallback&render=explicit" async defer></script>
+        {% render_block "js_uncompressed" %}
+
+        {# script to set gclid parameter from url as cookie #}
+        <script>
+            function getCookie(name) {
+                var value = '; ' + document.cookie;
+                var parts = value.split('; ' + name + '=');
+                if (parts.length == 2)
+                    return parts.pop().split(';').shift();
+            }
+
+            function setCookie(name, value, days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                var expires = '; expires=' + date.toGMTString();
+                document.cookie = name + '=' + value + expires + ';path=/';
+            }
+
+            function getParam(p) {
+                var match = RegExp('[?&]' + p + '=([^&]*)').exec(window.location.search);
+                return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+            }
+
+            function assignTrackingParameterToCookie(fieldParam) {
+                var field = getParam(fieldParam);
+                    //expires in 1 day
+                    setCookie(fieldParam, field, 1);
+            }
+
+            window.onload = function() {
+                var params = ['gclid','utm_source','msclkid'];
+                params.forEach(function (param) {
+                    if(getParam(param)){
+                    assignTrackingParameterToCookie(param);
+                }
+                });
+            }
+
+        </script>
+        {# old browser script #}
+        <script> 
+            var $buoop = {vs:{i:10,f:-4,o:-4,s:8,c:-4},api:4}; 
+            function $buo_f(){ 
+             var e = document.createElement("script"); 
+             e.src = "//browser-update.org/update.min.js"; 
+             document.body.appendChild(e);
+            };
+            try {document.addEventListener("DOMContentLoaded", $buo_f,false)}
+            catch(e){window.attachEvent("onload", $buo_f)}
+        </script>
+
+        <!-- Twitter universal website tag code -->
+        <script>
+            !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+            },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+            a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+            // Insert Twitter Pixel ID and Standard Event data below
+            twq('init','nxogj');
+            twq('track','PageView');
+        </script>
+        <!-- End Twitter universal website tag code -->
+        <!--  Breadcrumbs schema -->
+        {% block breadcrumbs %}
+
+            {% if breadcrumbs %}
+                <script type="application/ld+json">
+                    {
+                     "@context": "https://schema.org",
+                     "@type": "BreadcrumbList",
+                     "itemListElement": [
+                     {% for i in breadcrumbs %}
+                          {
+                           "@type": "ListItem",
+                           "position": {{i.position|safe}},
+                           "item":
+                           {
+                            "@id": "{{i.url|safe}}",
+                            "name": "{{i.name|safe}}"
+                            }
+                          } {% if i.position != breadcrumbs|length %}, {% endif %}
+                      {% endfor %}
+                     ]
+                    }
+                  </script>
+            {% else %}
+                {% if request.current_page.parent %}
+                    <script type="application/ld+json">
+                    {
+                     "@context": "https://schema.org",
+                     "@type": "BreadcrumbList",
+                     "itemListElement": [
+                      {
+                       "@type": "ListItem",
+                       "position": 1,
+                       "item":
+                       {
+                        "@id": "https://liferesidential.co.uk{% page_url request.current_page.parent  %}",
+                        "name": "{% page_attribute 'title' request.current_page.parent %}"
+                        }
+                      }, {
+                      "@type": "ListItem",
+                      "position": 2,
+                      "item":
+                       {
+                         "@id": "https://liferesidential.co.uk{% page_url request.current_page.parent.parent_id  %}",
+                         "name": "{% page_attribute title %}"
+                       }
+                      }
+                     ]
+                    }
+                  </script>
+                {% else %}
+                    <script type="application/ld+json">
+                    {
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {
+                            "@type": "ListItem",
+                            "position": 1,
+                            "item":
+                            {
+                                "@id": "https://liferesidential.co.uk/{% page_attribute title %}/",
+                                "name": "{% page_attribute title %}"
+                            }
+                        }
+                    ]
+                    }
+                </script>
+                {% endif %}
+            {% endif %}
+        {% endblock %}
+        <!--  End Breadcrumbs schema -->
+    </body>
+</html>

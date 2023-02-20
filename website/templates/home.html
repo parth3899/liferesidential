@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load cms_tags staticfiles %}
+
+{% block body_class %}class="home {{ request.current_page.get_title_obj.mytitleextension.get_nav_classes }}"{% endblock %}
+
+{% block nav_extra_attributes %}data-180="background:rgba(255, 255, 255, 0.0); border-bottom: 1px solid rgba(167, 167, 167,0.0);" data-200="background:rgba(255, 255, 255, 1.0);border-bottom: 1px solid rgba(167, 167, 167,0.5);"{% endblock %}
+{% block brand_extra_attributes %}data-0="width:120px; height:120px; top:20px;" data-200="width:60px; height:60px; top:10px;"{% endblock %}
+{% block tel_extra_attributes %}data-0="color: rgba(255,255,255,1);" data-200="color: rgba(17,17,17,1);"{% endblock %}
+{% block menu_extra_attributes %}data-0="background:url({% static 'life/img/images--icons/icon--menu-toggle.png' %}); background-position:0px 0px;" data-300="background:url({% static 'life/img/images--icons/icon--menu-toggle.png' %});background-position:0px -50px;"{% endblock %}
+
+{% block content %}
+    {% placeholder "hero" %}
+    {% placeholder "content" %}
+{% endblock content %}

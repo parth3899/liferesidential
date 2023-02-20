@@ -1,0 +1,15 @@
+{% extends 'internal.html' %}
+{% load cms_tags generic_tags %}
+
+{% block title %}{% render_text page.page_title %}{% endblock %}
+
+{% block meta_description %}{% render_text page.meta_description %}{% endblock %}
+
+{% block meta %}
+    {% if page.social_meta %}
+        {% include 'socialmeta/socialmeta.html' %}
+    {% endif %}
+{% endblock %}
+
+
+{% block body_class %}class="internal {{ page.get_nav_classes }} {% if 'vacancy' in request.path%} show-favorites {% endif %}"{% endblock %}

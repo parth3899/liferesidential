@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block body_class %}class="internal {{ request.current_page.get_title_obj.mytitleextension.get_nav_classes }}"{% endblock %}
+
+{% block content %}
+
+    {% placeholder "hero" %}
+
+    <section class="panel-content standard-page panel-content-last">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12 col-md-8">
+                    <div id="first-content" class="rte">
+                        {% placeholder "content" %}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4">
+                    {% placeholder "sidebar" %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}
+
+
